@@ -13,20 +13,20 @@
     const char *modelPathCStr = [modelPath UTF8String];
 
     // Create JSON request
-    NSMutableDictionary *request = [NSMutableDictionary dictionary];
-    request[@"model"] = modelPath;
-    request[@"audio"] = audioPath;
-    request[@"threads"] = options[@"threads"] ?: @(4);
-    request[@"language"] = options[@"language"] ?: @"auto";
-    request[@"is_verbose"] = options[@"isVerbose"] ?: @(NO);
-    request[@"is_translate"] = options[@"isTranslate"] ?: @(NO);
-    request[@"is_no_timestamps"] = options[@"isNoTimestamps"] ?: @(NO);
-    request[@"is_special_tokens"] = options[@"isSpecialTokens"] ?: @(NO);
-    request[@"split_on_word"] = options[@"splitOnWord"] ?: @(NO);
+    NSMutableDictionary *requestData = [NSMutableDictionary dictionary];
+    requestData[@"model"] = modelPath;
+    requestData[@"audio"] = audioPath;
+    requestData[@"threads"] = options[@"threads"] ?: @(4);
+    requestData[@"language"] = options[@"language"] ?: @"auto";
+    requestData[@"is_verbose"] = options[@"isVerbose"] ?: @(NO);
+    requestData[@"is_translate"] = options[@"isTranslate"] ?: @(NO);
+    requestData[@"is_no_timestamps"] = options[@"isNoTimestamps"] ?: @(NO);
+    requestData[@"is_special_tokens"] = options[@"isSpecialTokens"] ?: @(NO);
+    requestData[@"split_on_word"] = options[@"splitOnWord"] ?: @(NO);
 
     // Convert to JSON string
     NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:request options:0 error:&jsonError];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:requestData options:0 error:&jsonError];
     if (jsonError) {
         NSLog(@"JSON serialization error: %@", jsonError.localizedDescription);
         return nil;

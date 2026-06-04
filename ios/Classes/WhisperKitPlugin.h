@@ -11,5 +11,5 @@
 #endif
 #endif
 
-@interface WhisperKitPlugin : NSObject<FlutterPlugin>
+@interface WhisperKitPlugin (dummy)
 @end
