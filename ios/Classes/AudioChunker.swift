@@ -256,7 +256,7 @@ class AudioChunker: NSObject {
             totalChunks: chunks.count,
             totalDuration: totalDuration,
             processedDuration: processedDuration,
-            averageChunkDuration: chunks.isEmpty ? 0.0 : processedDuration / Float(chunks.count),
+            averageChunkDuration: chunks.isEmpty ? 0.0 : Double(processedDuration) / Double(chunks.count),
             speechChunks: chunks.filter { $0.hasSpeech }.count,
             silenceChunks: chunks.filter { $0.chunkType == .silence }.count,
             processingProgress: totalDuration > 0 ? Float(processedDuration) / Float(totalDuration) : 0.0
@@ -370,7 +370,7 @@ class AudioChunker: NSObject {
 
         // Calculate audio level
         var sum: Float = 0.0
-        vDSP_vsq(samples, 1, &sum, vDSP_Length(samples.count))
+        vDSP_vsq(samples, vDSP_Stride(1), &sum, vDSP_Stride(1), vDSP_Length(samples.count))
         let rmsLevel = sqrt(sum / Float(samples.count))
 
         // Zero crossing rate

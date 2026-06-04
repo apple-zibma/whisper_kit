@@ -222,7 +222,7 @@ class EnhancedAudioManager: NSObject {
         }
 
         // Get audio metadata
-        let metadata = formatConverter.getAudioMetadata(url: url)
+        guard let metadata = formatConverter.getAudioMetadata(url: url) else { throw NSError(domain: "whisper_kit", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get audio metadata"]) }
 
         // Analyze audio quality
         do {
@@ -303,16 +303,21 @@ class EnhancedAudioManager: NSObject {
     }
 
     private func preprocessAudioData(_ data: Data) throws -> Data {
-        return try withUnsafeThrowingContinuation { continuation in
-            audioPreprocessor.preprocessAudioData(data) { result in
-                switch result {
-                case .success(let processedData):
-                    continuation.resume(returning: processedData)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+        var resultData: Data?
+        var resultError: Error?
+        let semaphore = DispatchSemaphore(value: 0)
+        audioPreprocessor.preprocessAudioData(data) { result in
+            switch result {
+            case .success(let processedData):
+                resultData = processedData
+            case .failure(let error):
+                resultError = error
             }
+            semaphore.signal()
         }
+        semaphore.wait()
+        if let error = resultError { throw error }
+        return resultData ?? data
     }
 
     private func processChunks(_ chunks: [AudioChunkInfo], data: Data, metadata: AudioMetadata, completion: @escaping (EnhancedAudioResult) -> Void) {

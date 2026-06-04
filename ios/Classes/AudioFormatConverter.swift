@@ -177,10 +177,10 @@ class AudioFormatConverter: NSObject {
 
         if let audioTrack = asset.tracks(withMediaType: .audio).first {
             let formatDescriptions = audioTrack.formatDescriptions
-            for formatDescription in formatDescriptions {
-                if let streamDescription = (formatDescription as! CMAudioFormatDescription).streamBasicDescription {
-                    sampleRate = streamDescription.pointee.mSampleRate
-                    channelCount = Int(streamDescription.pointee.mChannelsPerFrame)
+            for format in formatDescriptions {
+                if let desc = format as? CMAudioFormatDescription, let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(desc) { let streamDescription = asbd.pointee
+                    sampleRate = streamDescription.mSampleRate
+                    channelCount = Int(streamDescription.mChannelsPerFrame)
                     break
                 }
             }

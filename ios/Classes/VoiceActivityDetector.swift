@@ -159,7 +159,7 @@ class VoiceActivityDetector: NSObject {
         super.init()
 
         setupThresholds()
-        logger.info("VAD initialized with frame size: \(frameSize), sample rate: \(sampleRate)")
+        logger.info("VAD initialized with frame size: \(self.frameSize), sample rate: \(self.sampleRate)")
     }
 
     // MARK: - Public Interface
@@ -334,7 +334,7 @@ class VoiceActivityDetector: NSObject {
 
         // Notify state change
         if previousState != currentState {
-            logger.debug("VAD state changed: \(previousState.description) -> \(currentState.description)")
+            logger.debug("VAD state changed: \(previousState.description) -> \(self.currentState.description)")
             DispatchQueue.main.async {
                 self.delegate?.vadDetector(self, didUpdateState: self.currentState)
             }

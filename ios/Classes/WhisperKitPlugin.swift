@@ -9,6 +9,32 @@ import Foundation
 func request(_ body: UnsafeMutablePointer<CChar>) -> UnsafeMutablePointer<CChar>?
 
 public class WhisperKitPlugin: NSObject, FlutterPlugin, EnhancedAudioManagerDelegate {
+    
+    // MARK: - EnhancedAudioManagerDelegate
+    
+    func audioManager(_ manager: EnhancedAudioManager, didStartProcessing startTime: TimeInterval) {
+        logger.info("Enhanced audio processing started")
+    }
+    
+    func audioManager(_ manager: EnhancedAudioManager, didProcessChunk chunk: AudioChunk, transcription: TranscriptionResult?) {
+        // Process chunk
+    }
+    
+    func audioManager(_ manager: EnhancedAudioManager, didDetectVoiceActivity isActive: Bool, timestamp: TimeInterval) {
+        // Voice activity detected
+    }
+    
+    func audioManager(_ manager: EnhancedAudioManager, didUpdateProgress progress: Float) {
+        // Progress update
+    }
+    
+    func audioManager(_ manager: EnhancedAudioManager, didCompleteProcessing finalResult: EnhancedAudioResult) {
+        logger.info("Enhanced audio processing completed")
+    }
+    
+    func audioManager(_ manager: EnhancedAudioManager, didEncounterError error: Error) {
+        logger.error("Enhanced audio processing error: \(error.localizedDescription)")
+    }
   let logger = Logger(subsystem: "com.whisper_kit", category: "Plugin")
   private let audioRecorder = AudioRecorder()
   private let permissionManager = PermissionManager()
@@ -315,7 +341,7 @@ public class WhisperKitPlugin: NSObject, FlutterPlugin, EnhancedAudioManagerDele
     let cString = jsonString.cString(using: .utf8)
     let mutableString = strdup(cString!)
 
-    guard let resultC = request(mutableString) else {
+    guard let mutableString = mutableString, let resultC = request(mutableString) else {
       logger.error("C++ request function returned nil")
       free(mutableString)
       return nil
