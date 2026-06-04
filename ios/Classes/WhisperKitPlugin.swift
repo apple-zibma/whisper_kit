@@ -35,6 +35,10 @@ public class WhisperKitPlugin: NSObject, FlutterPlugin, EnhancedAudioManagerDele
     func audioManager(_ manager: EnhancedAudioManager, didEncounterError error: Error) {
         logger.error("Enhanced audio processing error: \(error.localizedDescription)")
     }
+
+    func audioManager(_ manager: EnhancedAudioManager, didChangeQuality quality: AudioQuality) {
+        logger.info("Enhanced audio quality changed")
+    }
   let logger = Logger(subsystem: "com.whisper_kit", category: "Plugin")
   private let audioRecorder = AudioRecorder()
   private let permissionManager = PermissionManager()
