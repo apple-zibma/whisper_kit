@@ -39,7 +39,7 @@ struct TranscriptionResult {
     let confidence: Float
     let language: String?
     let timestamp: TimeInterval
-    let processingTime: TimeInterval
+    var processingTime: TimeInterval
 
     init(text: String, segments: [TranscriptionSegment] = [], confidence: Float = 0.0, language: String? = nil, timestamp: TimeInterval = Date().timeIntervalSince1970, processingTime: TimeInterval = 0.0) {
         self.text = text
@@ -288,14 +288,14 @@ class StreamingAudioProcessor: NSObject {
         audioBuffer.append(audioData)
 
         // Check if we have enough data for a chunk
-        let chunkSize = Int(chunkDuration * sampleRate * MemoryLayout<Float>.size)
+        let chunkSize = Int(chunkDuration * Double(sampleRate) * Double(MemoryLayout<Float>.size))
         if audioBuffer.count >= chunkSize {
             let chunkData = audioBuffer.prefix(chunkSize)
-            audioBuffer.removeFirst(chunkSize - Int(overlapDuration * sampleRate * MemoryLayout<Float>.size))
+            audioBuffer.removeFirst(chunkSize - Int(overlapDuration * Double(sampleRate) * Double(MemoryLayout<Float>.size)))
 
             let chunk = AudioChunk(
                 data: Data(chunkData),
-                timestamp: time.timeIntervalSince1970,
+                timestamp: Date().timeIntervalSince1970,
                 duration: chunkDuration,
                 audioLevel: audioLevel,
                 containsVoice: containsVoice
@@ -368,7 +368,7 @@ class StreamingAudioProcessor: NSObject {
 
         // Calculate RMS (Root Mean Square)
         var sum: Float = 0.0
-        vDSP_vsq(samples, 1, &sum, vDSP_Length(samples.count))
+        vDSP_vsq(samples, vDSP_Stride(1), &sum, vDSP_Stride(1), vDSP_Length(samples.count))
         let rms = sqrt(sum / Float(samples.count))
 
         return min(rms, 1.0)

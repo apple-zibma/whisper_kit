@@ -168,8 +168,8 @@ class AudioFormatConverter: NSObject {
     func getAudioMetadata(url: URL) -> AudioMetadata? {
         let asset = AVURLAsset(url: url)
 
-        guard let duration = asset.duration.seconds,
-              duration > 0 else { return nil }
+        let duration = asset.duration.seconds
+        guard duration > 0 else { return nil }
 
         var sampleRate: Double = 0
         var channelCount: Int = 0
@@ -178,7 +178,7 @@ class AudioFormatConverter: NSObject {
         if let audioTrack = asset.tracks(withMediaType: .audio).first {
             let formatDescriptions = audioTrack.formatDescriptions
             for formatDescription in formatDescriptions {
-                if let streamDescription = formatDescription.streamBasicDescription {
+                if let streamDescription = (formatDescription as! CMAudioFormatDescription).streamBasicDescription {
                     sampleRate = streamDescription.pointee.mSampleRate
                     channelCount = Int(streamDescription.pointee.mChannelsPerFrame)
                     break
@@ -186,7 +186,7 @@ class AudioFormatConverter: NSObject {
             }
         }
 
-        bitRate = Int(asset.preferredTrackRate) // Approximation
+        bitRate = Int(asset.preferredRate) // Approximation
 
         let fileSize = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int64) ?? 0
 
@@ -234,7 +234,7 @@ class AudioFormatConverter: NSObject {
             }
 
             // Configure converter
-            converter.bitRate = settings.bitRate
+            converter.bitRate = (settings.bitRate ?? 0)
             converter.sampleRateConverterQuality = .max
 
             // Perform conversion
@@ -345,7 +345,7 @@ class AudioFormatConverter: NSObject {
             return AVAudioFormat(settings: [
                 AVFormatIDKey: kAudioFormatMPEG4AAC,
                 AVSampleRateKey: settings.sampleRate,
-                AVNumberOfChannelsKey: settings.channelCount,
+                AVNumberOfChannelsKey: Int(settings.channelCount),
                 AVEncoderBitRateKey: settings.bitRate ?? 128000,
                 AVEncoderAudioQualityKey: settings.quality.rawValue
             ])!
@@ -353,22 +353,22 @@ class AudioFormatConverter: NSObject {
             return AVAudioFormat(settings: [
                 AVFormatIDKey: kAudioFormatMPEGLayer3,
                 AVSampleRateKey: settings.sampleRate,
-                AVNumberOfChannelsKey: settings.channelCount,
+                AVNumberOfChannelsKey: Int(settings.channelCount),
                 AVEncoderBitRateKey: settings.bitRate ?? 128000
             ])!
         case .flac:
             return AVAudioFormat(settings: [
                 AVFormatIDKey: kAudioFormatFLAC,
                 AVSampleRateKey: settings.sampleRate,
-                AVNumberOfChannelsKey: settings.channelCount,
+                AVNumberOfChannelsKey: Int(settings.channelCount),
                 AVLinearPCMBitDepthKey: settings.bitDepth,
-                AVEncoderAudioQualityKey: AudioQuality.lossless.rawValue
+                AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue
             ])!
         case .ogg:
             return AVAudioFormat(settings: [
                 AVFormatIDKey: kAudioFormatOpus,
                 AVSampleRateKey: settings.sampleRate,
-                AVNumberOfChannelsKey: settings.channelCount,
+                AVNumberOfChannelsKey: Int(settings.channelCount),
                 AVEncoderBitRateKey: settings.bitRate ?? 96000
             ])!
         }
@@ -421,7 +421,7 @@ class AudioFormatConverter: NSObject {
     }
 
     private func createPCMBuffer(from data: Data, format: AVAudioFormat) throws -> AVAudioPCMBuffer {
-        let frameCount = AVAudioFrameCount(data.count / (format.streamDescription.pointee.mBytesPerFrame))
+        let frameCount = AVAudioFrameCount(Int(data.count) / Int(format.streamDescription.pointee.mBytesPerFrame))
         let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount)!
 
         if let floatChannelData = buffer.floatChannelData {

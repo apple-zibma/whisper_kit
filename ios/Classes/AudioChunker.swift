@@ -1,4 +1,5 @@
 import Foundation
+import Accelerate
 import AVFoundation
 import os.log
 
@@ -255,10 +256,10 @@ class AudioChunker: NSObject {
             totalChunks: chunks.count,
             totalDuration: totalDuration,
             processedDuration: processedDuration,
-            averageChunkDuration: chunks.isEmpty ? 0.0 : processedDuration / Double(chunks.count),
+            averageChunkDuration: chunks.isEmpty ? 0.0 : processedDuration / Float(chunks.count),
             speechChunks: chunks.filter { $0.hasSpeech }.count,
             silenceChunks: chunks.filter { $0.chunkType == .silence }.count,
-            processingProgress: totalDuration > 0 ? processedDuration / totalDuration : 0.0
+            processingProgress: totalDuration > 0 ? Float(processedDuration) / Float(totalDuration) : 0.0
         )
     }
 

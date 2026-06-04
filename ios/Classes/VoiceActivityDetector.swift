@@ -352,7 +352,7 @@ class VoiceActivityDetector: NSObject {
         guard !samples.isEmpty else { return 0.0 }
 
         var sum: Float = 0.0
-        vDSP_vsq(samples, 1, &sum, vDSP_Length(samples.count))
+        vDSP_vsq(samples, vDSP_Stride(1), &sum, vDSP_Stride(1), vDSP_Length(samples.count))
         return sqrt(sum / Float(samples.count))
     }
 
@@ -386,12 +386,12 @@ class VoiceActivityDetector: NSObject {
 
         // Copy samples to temp buffer
         paddedSamples.withUnsafeBufferPointer { buffer in
-            tempBuffer.initialize(from: buffer)
+            let bufPtr = UnsafeMutableBufferPointer(start: tempBuffer, count: fftSize); _ = bufPtr.initialize(from: paddedSamples)
         }
 
         // Perform FFT
-        vDSP_fft_zrip(vDSP_create_fftsetup(vDSP_Length(log2(Double(fftSize))), FFTRadix(kFFTRadix2))!,
-                      &splitComplex, 1, vDSP_Length(log2(Double(fftSize))))
+        let log2n = vDSP_Length(log2(Double(fftSize))); let fftSetup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2))!; vDSP_fft_zrip(fftSetup,
+                      &splitComplex, 1, vDSP_Length(log2(Double(fftSize))))splitComplex, vDSP_Stride(1), log2n, FFTDirection(kFFTDirection_Forward)); vDSP_destroy_fftsetup(fftSetup)
 
         // Calculate magnitude spectrum
         var magnitudes = [Float](repeating: 0.0, count: fftSize / 2)

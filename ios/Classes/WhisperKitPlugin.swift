@@ -13,8 +13,8 @@ public class WhisperKitPlugin: NSObject, FlutterPlugin {
   private let audioRecorder = AudioRecorder()
   private let permissionManager = PermissionManager()
   private let modelManager = ModelManager()
-  private let audioPreprocessor = AudioPreprocessor()
-  private let formatConverter = AudioFormatConverter()
+  let audioPreprocessor = AudioPreprocessor()
+  let formatConverter = AudioFormatConverter()
 
   // Enhanced audio processing
   var enhancedAudioManager: EnhancedAudioManager?

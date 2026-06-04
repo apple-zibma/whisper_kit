@@ -432,7 +432,7 @@ class AudioPreprocessor: NSObject {
         guard !samples.isEmpty else { return 0.0 }
 
         var sum: Float = 0.0
-        vDSP_vsq(samples, 1, &sum, vDSP_Length(samples.count))
+        vDSP_vsq(samples, vDSP_Stride(1), &sum, vDSP_Stride(1), vDSP_Length(samples.count))
         return sqrt(sum / Float(samples.count))
     }
 
@@ -530,6 +530,7 @@ private class BiquadFilter {
     private var b1: Float = 0.0
     private var b2: Float = 0.0
     private var a1: Float = 0.0
+    private var a0: Float = 0.0
     private var a2: Float = 0.0
 
     private var x1: Float = 0.0
