@@ -391,7 +391,7 @@ class VoiceActivityDetector: NSObject {
 
         // Perform FFT
         let log2n = vDSP_Length(log2(Double(fftSize))); let fftSetup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2))!; vDSP_fft_zrip(fftSetup,
-                      &splitComplex, 1, vDSP_Length(log2(Double(fftSize))))splitComplex, vDSP_Stride(1), log2n, FFTDirection(kFFTDirection_Forward)); vDSP_destroy_fftsetup(fftSetup)
+                      &splitComplex, vDSP_Stride(1), log2n, FFTDirection(kFFTDirection_Forward)); vDSP_destroy_fftsetup(fftSetup)
 
         // Calculate magnitude spectrum
         var magnitudes = [Float](repeating: 0.0, count: fftSize / 2)
