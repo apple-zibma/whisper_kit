@@ -8,8 +8,8 @@ import Foundation
 @_silgen_name("request")
 func request(_ body: UnsafeMutablePointer<CChar>) -> UnsafeMutablePointer<CChar>?
 
-public class WhisperKitPlugin: NSObject, FlutterPlugin {
-  private let logger = Logger(subsystem: "com.whisper_kit", category: "Plugin")
+public class WhisperKitPlugin: NSObject, FlutterPlugin, EnhancedAudioManagerDelegate {
+  let logger = Logger(subsystem: "com.whisper_kit", category: "Plugin")
   private let audioRecorder = AudioRecorder()
   private let permissionManager = PermissionManager()
   private let modelManager = ModelManager()

@@ -173,10 +173,9 @@ extension WhisperKitPlugin {
                     "dynamicRange": qualityAnalysis.dynamicRange,
                     "qualityDescription": qualityAnalysis.qualityDescription,
                     "noiseLevelDescription": qualityAnalysis.noiseLevelDescription,
-                    "recommendedSettings": qualityAnalysis.recommendedSettings == .default ? "default" :
-                                     qualityAnalysis.recommendedSettings == .minimal ? "minimal" : "aggressive"
+                    "recommendedSettings": String(describing: qualityAnalysis.recommendedSettings)
                 ],
-                "metadata": convertAudioMetadataToDict(metadata)
+                "metadata": metadata != nil ? convertAudioMetadataToDict(metadata!) : [:]
             ])
 
         } catch {
@@ -286,17 +285,11 @@ extension WhisperKitPlugin {
 
     private func parsePreprocessingSettings(from dict: [String: Any]) -> AudioPreprocessingSettings {
         let qualityString = dict["quality"] as? String ?? "default"
-        let quality: AudioPreprocessingSettings.AudioQuality
-
         switch qualityString.lowercased() {
-        case "minimal": quality = .minimal
-        case "aggressive": quality = .aggressive
-        default: quality = .default
+        case "minimal": return AudioPreprocessingSettings.minimal
+        case "aggressive": return AudioPreprocessingSettings.aggressive
+        default: return AudioPreprocessingSettings.default
         }
-
-        return quality == .default ? AudioPreprocessingSettings.default :
-               quality == .minimal ? AudioPreprocessingSettings.minimal :
-               AudioPreprocessingSettings.aggressive
     }
 
     private func parseVADConfiguration(from dict: [String: Any]) -> VADConfiguration {
