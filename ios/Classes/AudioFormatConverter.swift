@@ -178,7 +178,7 @@ class AudioFormatConverter: NSObject {
         if let audioTrack = asset.tracks(withMediaType: .audio).first {
             let formatDescriptions = audioTrack.formatDescriptions
             for format in formatDescriptions {
-                if let desc = format as? CMAudioFormatDescription, let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(desc) { let streamDescription = asbd.pointee
+                if let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(format as! CMAudioFormatDescription) { let streamDescription = asbdPtr.pointee
                     sampleRate = streamDescription.mSampleRate
                     channelCount = Int(streamDescription.mChannelsPerFrame)
                     break
@@ -340,7 +340,7 @@ class AudioFormatConverter: NSObject {
     private func createTargetFormat(settings: AudioConversionSettings) -> AVAudioFormat {
         switch settings.targetFormat {
         case .wav, .pcm:
-            return AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: settings.sampleRate, channels: settings.channelCount, interleaved: false)!
+            return AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: settings.sampleRate, channels: AVAudioChannelCount(UInt32(settings.channelCount)), interleaved: false)!
         case .m4a, .aac:
             return AVAudioFormat(settings: [
                 AVFormatIDKey: kAudioFormatMPEG4AAC,

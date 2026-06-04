@@ -222,7 +222,7 @@ class EnhancedAudioManager: NSObject {
         }
 
         // Get audio metadata
-        guard let metadata = formatConverter.getAudioMetadata(url: url) else { throw NSError(domain: "whisper_kit", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get audio metadata"]) }
+        guard let metadata = formatConverter.getAudioMetadata(url: url) else { completion(.failure(NSError(domain: "whisper_kit", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get audio metadata"]))); return }
 
         // Analyze audio quality
         do {
